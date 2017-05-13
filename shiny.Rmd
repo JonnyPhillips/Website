@@ -1,7 +1,4 @@
 ---
-title: "Shiny"
-author: "JP"  
-date: "May 13, 2017"
 output: html_document
 ---
 
@@ -9,4 +6,4 @@ output: html_document
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-<iframe width="560" height="315" src="https://poliong.shinyapps.io/App4/" frameborder="0" allowfullscreen></iframe>
+<iframe width="100%" height="100%" src="https://poliong.shinyapps.io/App4/" frameborder="0" allowfullscreen></iframe>

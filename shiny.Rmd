@@ -1,34 +1,12 @@
 ---
 title: "Shiny"
-author: "JP"
-runtime: shiny
+author: "JP"  
 date: "May 13, 2017"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
-library(shiny)
 ```
 
-```{r cars}
-summary(cars)
-
-```
-
-```{r, echo = FALSE}
-shinyApp(
-  
-  ui = fluidPage(
-    plotOutput("carsplot")
-  ),
-  
-  server = function(output) {
-    output$carsplot <- renderPlot({
-      plot(cars$speed,cars$dist)
-    })
-  },
-  
-  options = list(height = 500)
-)
-```
+<iframe width="560" height="315" src="https://poliong.shinyapps.io/App4/" frameborder="0" allowfullscreen></iframe>

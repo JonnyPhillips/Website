@@ -5,8 +5,8 @@ navbar:
   left:
     - text: "Home"
       href: index.html
-    - text: "About Me"
-      href: about.html
+    - text: "Shiny"
+      href: shiny.html
 output:
   html_document:
     theme: flatly

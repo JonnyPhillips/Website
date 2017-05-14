@@ -7,8 +7,12 @@ navbar:
       icon: fa-home
       href: index.html
     - text: "Shiny"
+      icon: area-chart
       href: shiny.html
 output:
   html_document:
-    theme: flatly
+    theme: readable
     css: style.css
+    highlight: tango
+    toc: true
+    toc_float: true

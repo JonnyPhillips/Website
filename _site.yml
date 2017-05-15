@@ -10,6 +10,7 @@ navbar:
       icon: fa-area-chart
       href: shiny.html
     - text: "Publications"
+      icon: fa-book
       href: pubs.html
 output:
   html_document:

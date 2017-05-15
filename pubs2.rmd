@@ -1,0 +1,15 @@
+--- 
+output: html_document
+bibliography: Refs.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Publications
+
+[@Grossman2016]
+[@Dhillon2015]
+[@Diagne2014]
+[@Pan2008]

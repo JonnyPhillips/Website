@@ -11,7 +11,7 @@ navbar:
       href: shiny.html
     - text: "Publications"
       icon: fa-book
-      href: pubs.html
+      href: pubs2.html
 output:
   html_document:
     theme: journal

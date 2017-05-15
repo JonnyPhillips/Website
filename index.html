@@ -9,68 +9,20 @@
 <meta name="generator" content="pandoc" />
 
 
-<meta name="author" content="JP" />
 
-<meta name="date" content="2017-05-13" />
 
 <title>Index</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/readable.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/journal.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
-<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
-<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
-<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 
-<style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; background-color: #f8f8f8; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-pre, code { background-color: #f8f8f8; }
-code > span.kw { color: #204a87; font-weight: bold; } /* Keyword */
-code > span.dt { color: #204a87; } /* DataType */
-code > span.dv { color: #0000cf; } /* DecVal */
-code > span.bn { color: #0000cf; } /* BaseN */
-code > span.fl { color: #0000cf; } /* Float */
-code > span.ch { color: #4e9a06; } /* Char */
-code > span.st { color: #4e9a06; } /* String */
-code > span.co { color: #8f5902; font-style: italic; } /* Comment */
-code > span.ot { color: #8f5902; } /* Other */
-code > span.al { color: #ef2929; } /* Alert */
-code > span.fu { color: #000000; } /* Function */
-code > span.er { color: #a40000; font-weight: bold; } /* Error */
-code > span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #000000; } /* Constant */
-code > span.sc { color: #000000; } /* SpecialChar */
-code > span.vs { color: #4e9a06; } /* VerbatimString */
-code > span.ss { color: #4e9a06; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #000000; } /* Variable */
-code > span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #ce5c00; font-weight: bold; } /* Operator */
-code > span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
-code > span.ex { } /* Extension */
-code > span.at { color: #c4a000; } /* Attribute */
-code > span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
-code > span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
-</style>
-<style type="text/css">
-  pre:not([class]) {
-    background-color: white;
-  }
-</style>
 
 
 <style type="text/css">
@@ -132,34 +84,34 @@ button.code-folding-btn:focus {
 <style type="text/css">
 /* padding for bootstrap navbar */
 body {
-  padding-top: 66px;
+  padding-top: 61px;
   padding-bottom: 40px;
 }
 /* offset scroll position for anchor links (for fixed navbar)  */
 .section h1 {
-  padding-top: 71px;
-  margin-top: -71px;
+  padding-top: 66px;
+  margin-top: -66px;
 }
 
 .section h2 {
-  padding-top: 71px;
-  margin-top: -71px;
+  padding-top: 66px;
+  margin-top: -66px;
 }
 .section h3 {
-  padding-top: 71px;
-  margin-top: -71px;
+  padding-top: 66px;
+  margin-top: -66px;
 }
 .section h4 {
-  padding-top: 71px;
-  margin-top: -71px;
+  padding-top: 66px;
+  margin-top: -66px;
 }
 .section h5 {
-  padding-top: 71px;
-  margin-top: -71px;
+  padding-top: 66px;
+  margin-top: -66px;
 }
 .section h6 {
-  padding-top: 71px;
-  margin-top: -71px;
+  padding-top: 66px;
+  margin-top: -66px;
 }
 </style>
 
@@ -196,101 +148,6 @@ $(document).ready(function () {
 
 
 
-<script>
-$(document).ready(function ()  {
-
-    // move toc-ignore selectors from section div to header
-    $('div.section.toc-ignore')
-        .removeClass('toc-ignore')
-        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
-
-    // establish options
-    var options = {
-      selectors: "h1,h2,h3",
-      theme: "bootstrap3",
-      context: '.toc-content',
-      hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
-      },
-      ignoreSelector: ".toc-ignore",
-      scrollTo: 0
-    };
-    options.showAndHide = true;
-    options.smoothScroll = true;
-
-    // tocify
-    var toc = $("#TOC").tocify(options).data("toc-tocify");
-});
-</script>
-
-<style type="text/css">
-
-#TOC {
-  margin: 25px 0px 20px 0px;
-}
-@media (max-width: 768px) {
-#TOC {
-  position: relative;
-  width: 100%;
-}
-}
-
-
-.toc-content {
-  padding-left: 30px;
-  padding-right: 40px;
-}
-
-div.main-container {
-  max-width: 1200px;
-}
-
-div.tocify {
-  width: 20%;
-  max-width: 260px;
-  max-height: 85%;
-}
-
-@media (min-width: 768px) and (max-width: 991px) {
-  div.tocify {
-    width: 25%;
-  }
-}
-
-@media (max-width: 767px) {
-  div.tocify {
-    width: 100%;
-    max-width: none;
-  }
-}
-
-.tocify ul, .tocify li {
-  line-height: 20px;
-}
-
-.tocify-subheader .tocify-item {
-  font-size: 0.90em;
-  padding-left: 25px;
-  text-indent: 0;
-}
-
-.tocify .list-group-item {
-  border-radius: 0px;
-}
-
-
-</style>
-
-<!-- setup 3col/9col grid for toc_float and main content  -->
-<div class="row-fluid">
-<div class="col-xs-12 col-sm-4 col-md-3">
-<div id="TOC" class="tocify">
-</div>
-</div>
-
-<div class="toc-content col-xs-12 col-sm-8 col-md-9">
-
-
 
 
 <div class="navbar navbar-default  navbar-fixed-top" role="navigation">
@@ -301,7 +158,7 @@ div.tocify {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">J Website</a>
+      <a class="navbar-brand" href="index.html">Jonathan Phillips</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
@@ -314,10 +171,13 @@ div.tocify {
 </li>
 <li>
   <a href="shiny.html">
-    <span class="area area-chart"></span>
+    <span class="fa fa-area-chart"></span>
      
-    Shiny
+    Explore Data
   </a>
+</li>
+<li>
+  <a href="pubs.html">Publications</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -332,36 +192,19 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Index</h1>
-<h4 class="author"><em>JP</em></h4>
-<h4 class="date"><em>May 13, 2017</em></h4>
 
 </div>
 
 
-<div id="intro-to-website" class="section level2">
-<h2>Intro to website</h2>
-<p>This is a temporary website test.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(cars)</code></pre></div>
-<pre><code>##      speed           dist       
-##  Min.   : 4.0   Min.   :  2.00  
-##  1st Qu.:12.0   1st Qu.: 26.00  
-##  Median :15.0   Median : 36.00  
-##  Mean   :15.4   Mean   : 42.98  
-##  3rd Qu.:19.0   3rd Qu.: 56.00  
-##  Max.   :25.0   Max.   :120.00</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">quantile</span>(cars$speed)</code></pre></div>
-<pre><code>##   0%  25%  50%  75% 100% 
-##    4   12   15   19   25</code></pre>
-</div>
-<div id="including-plots" class="section level2">
-<h2>Including Plots</h2>
-<p><img src="index_files/figure-html/pressure-1.png" width="672" /></p>
+<div id="my-research" class="section level2">
+<h2>My Research</h2>
+<p>My research focuses on understanding political change and the quality of democracy in developing countries. Specifically, when can citizens access public resources on the basis of needs and entitlements (‘programmatically’) and not solely based on their political connections (`clientelism’)? Through subnational comparisons in my primary fieldwork sites in Brazil, Nigeria and India I seek to clarify the incentives that lead some politicians to focus on enforcing clear rules rather than diverting resources to political supporters. Through original surveys and innovative methods I seek to understand under what conditions citizens are empowered to vote freely and hold political elites accountable.</p>
+<p>I’m also interested in improving how political economy is communicated. That includes attempts at visualizing data as cubes or hexagons, a joint project with the University of Sao Paulo to map Brazil’s electoral data, and collaboration with Kaduna State Government to rapidly increase their capability in electronic data collection and analysis. I’ve also learnt a huge amount through teaching classes in the Politics of Brazil, Political Economy of Africa and Microeconomics - Information Economics and Game Theory.</p>
+<p>Currently I am studying for a PhD in Government at Harvard University. Previously I worked with a phenomenal team of civil servants to guide investments in the MDGs within Nigeria’s Federal Government. I have also studied at SOAS and Oxford, worked for Oxera, and Vivid Economics, consulted for DFID and the World Bank and interned for Martin Horwood MP in the UK Parliament.</p>
 </div>
 
 
 
-</div>
-</div>
 
 </div>
 

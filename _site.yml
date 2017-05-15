@@ -1,18 +1,18 @@
-name: "J-website"
+name: "Jonathan Phillips"
 output_dir: "."
 navbar:
-  title: "J Website"
+  title: "Jonathan Phillips"
   left:
     - text: "Home"
       icon: fa-home
       href: index.html
-    - text: "Shiny"
-      icon: area-chart
+    - text: "Explore Data"
+      icon: fa-area-chart
       href: shiny.html
+    - text: "Publications"
+      href: pubs.html
 output:
   html_document:
-    theme: readable
+    theme: journal
     css: style.css
     highlight: tango
-    toc: true
-    toc_float: true

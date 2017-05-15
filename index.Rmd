@@ -1,7 +1,7 @@
 ---
 title: "Index"
-author: "JP"
-date: "May 13, 2017"
+#author: "JP"
+#date: "May 13, 2017"
 output: html_document
 ---
 
@@ -9,19 +9,9 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Intro to website
+## My Research
+My research focuses on understanding political change and the quality of democracy in developing countries. Specifically, when can citizens access public resources on the basis of needs and entitlements ('programmatically') and not solely based on their political connections (`clientelism')? Through subnational comparisons in my primary fieldwork sites in Brazil, Nigeria and India I seek to clarify the incentives that lead some politicians to focus on enforcing clear rules rather than diverting resources to political supporters. Through original surveys and innovative methods I seek to understand under what conditions citizens are empowered to vote freely and hold political elites accountable.
 
-This is a temporary website test. 
+I'm also interested in improving how political economy is communicated. That includes attempts at visualizing data as cubes or hexagons, a joint project with the University of Sao Paulo to map Brazil's electoral data, and collaboration with Kaduna State Government to rapidly increase their capability in electronic data collection and analysis. I've also learnt a huge amount through teaching classes in the Politics of Brazil, Political Economy of Africa and Microeconomics - Information Economics and Game Theory. 
 
-```{r cars}
-summary(cars)
-quantile(cars$speed)
-
-```
-
-## Including Plots
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
+Currently I am studying for a PhD in Government at Harvard University. Previously I worked with a phenomenal team of civil servants to guide investments in the MDGs within Nigeria's Federal Government. I have also studied at SOAS and Oxford, worked for Oxera, and Vivid Economics, consulted for DFID and the World Bank and interned for Martin Horwood MP in the UK Parliament.

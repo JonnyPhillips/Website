@@ -6,9 +6,3 @@ nocite: |
 ---
 
 ## Publications
-
-* @Grossman2017
-* @Dhillon2015
-* @Diagne2014
-* @Pan2008
-

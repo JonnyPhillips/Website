@@ -1,6 +1,8 @@
 --- 
 output: html_document
 bibliography: My_papers.bib
+nocite: | 
+  @Grossman2017, @Dhillon2015, @Diagne2014, @Pan2008
 ---
 
 ## Publications

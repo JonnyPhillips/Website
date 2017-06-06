@@ -6,6 +6,9 @@ navbar:
     - text: "Home"
       icon: fa-home
       href: index.html
+    - text: "Governance"
+      icon: fa-institution
+      href: governance.html
     - text: "Explore Data"
       icon: fa-area-chart
       href: shiny.html

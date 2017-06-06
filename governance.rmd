@@ -1,0 +1,14 @@
+---
+title: "Good Governance in Poor Places"
+#author: "JP"
+#date: "June 6, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This dissertation and book manuscript explains when and why politicians choose to introduce rule-based inclusive governance and abandon clientelism even in extremely poor places. 
+
+Most theories argue that good governance occurs with sustained economic development that creates voter demand (modernization), or when political parties without access to patronage come to power (externally-mobilized parties). I use evidence from dozens of subnational cases to show that in fact politicians consistently adopt good governance when they need to fight off stronger clientelist competitors within their own party. By using the state to enforce strict rules and cut off access to clientelist resources, a party leader can centralize power and prolong their political career. Strikingly, this means that good governance can occur even in very poor places with poorly disciplined parties if competition among elites is properly aligned.

@@ -1,0 +1,12 @@
+---
+title: "Nigeria"
+#author: "JP"
+#date: "June 6, 2017"
+output: html_document
+---
+
+
+
+Kaduna State Government has since 2015 launched a politically-aware reform process that seeks to embed good governance within the daily life and politics of the state. Collaborating with the Ministry of Budget and Planning and the Kaduna State Bureau of Statistics I have been privileged to work with the most committed and capable public servants. In just two years the Bureau of Statistics has learned how to conduct representative electronic surveys and has collected data on two household surveys, two school censuses and a GDP survey. The most recent household survey shows the remarkable progress the administration is making. 
+
+As an ODI Fellow and Economist I was embedded for three years as a civil servant in the Office of the Senior Special Assistant to the President on MDGs. Under the leadership of Amina Mohammed the office developed a politically-aware approach to reform which transformed public service delivery for millions of Nigerians. The Conditional Grants Scheme supported technocrats in state governments to make sure public investments were completed and operational. The OPEN monitoring and evaluation platform set new standards for involving civil society in the supervision of government activity. The [MDGs Baseline Facility Analysis](http://nmis.mdgs.gov.ng//) collected - for the first time - detailed data on every clinic and school in the country, allowing a systematic diagnosis and targeting of public service challenges.

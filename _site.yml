@@ -9,9 +9,12 @@ navbar:
     - text: "Governance"
       icon: fa-institution
       href: governance.html
-    - text: "Explore Data"
+    - text: "Nigeria"
+      icon: fa-flag
+      href: nigeria.html
+    - text: "Data"
       icon: fa-area-chart
-      href: shiny.html
+      href: data.html
     - text: "Publications"
       icon: fa-book
       href: publications.html

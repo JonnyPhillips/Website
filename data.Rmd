@@ -3,3 +3,5 @@ output: html_document
 ---
 
 #Dataverse
+
+<script src="https://dataverse.harvard.edu/resources/js/widgets.js?alias=jphillips&amp;dvUrl=https://dataverse.harvard.edu&amp;widgetScope=jphillips&amp;widget=iframe&amp;heightPx=500"></script>

@@ -1,0 +1,8 @@
+---
+#title: "Kaduna"
+#author: "JP"
+#date: "June 9, 2017"
+output: html_document
+---
+
+[Kaduna State Government](http://kdsg.gov.ng/) has since 2015 launched a politically-aware reform process that seeks to embed good governance within the daily life and politics of the state. Collaborating with the Ministry of Budget and Planning and the [Kaduna State Bureau of Statistics](https://twitter.com/kdbstatistics?lang=en) I have been privileged to work with the most committed and capable public servants. In just two years the Bureau of Statistics has learned how to conduct representative electronic surveys and has collected data on two household surveys, two school censuses and a GDP survey. The most recent household survey shows the remarkable progress the administration is making. 

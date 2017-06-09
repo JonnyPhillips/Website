@@ -9,9 +9,24 @@ navbar:
     - text: "Governance"
       icon: fa-institution
       href: governance.html
+      menu: 
+        - text: "Governance"
+          href: governance.html
+        - text: "Bihar"
+          href: bihar.html
     - text: "Nigeria"
       icon: fa-flag
       href: nigeria.html
+      menu: 
+        - text: "Polio Vaccination"
+          icon: eyedropper
+          href: polio.html
+        - text: "MDGs"
+          icon: heartbeat
+          href: mgds.html
+        - text: "Kaduna"
+          icon: users
+          href: kaduna.html
     - text: "Data"
       icon: fa-area-chart
       href: data.html

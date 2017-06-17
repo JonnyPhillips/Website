@@ -36,7 +36,6 @@ navbar:
     - text: "Publications"
       icon: fa-book
       href: pubs3.html
-
 output:
   html_document:
     theme: journal

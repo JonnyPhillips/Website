@@ -5,5 +5,5 @@ title: "Bihar"
 output: html_document
 ---
 
-<iframe src="https://poliong.shinyapps.io/bihar/" style="border: none; width: 1200px; height: 450px"></iframe>
+<iframe src="https://poliong.shinyapps.io/bihar/" style="border: none; width: 1000px; height: 450px"></iframe>
 

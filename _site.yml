@@ -19,20 +19,24 @@ navbar:
       href: nigeria.html
       menu: 
         - text: "Polio Vaccination"
-          icon: eyedropper
+          icon: fa-eyedropper
           href: polio.html
         - text: "MDGs"
-          icon: heartbeat
+          icon: fa-heartbeat
           href: mgds.html
         - text: "Kaduna"
-          icon: users
+          icon: fa-users
           href: kaduna.html
     - text: "Data"
       icon: fa-area-chart
       href: data.html
+    - text: "Teaching"
+      icon: fa-line-chart
+      href: teaching.html
     - text: "Publications"
       icon: fa-book
-      href: publications.html
+      href: publications_v2.html
+
 output:
   html_document:
     theme: journal

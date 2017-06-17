@@ -35,7 +35,7 @@ navbar:
       href: teaching.html
     - text: "Publications"
       icon: fa-book
-      href: publications_v2.html
+      href: pubs3.html
 
 output:
   html_document:

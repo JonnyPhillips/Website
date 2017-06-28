@@ -10,26 +10,26 @@ navbar:
       icon: fa-institution
       href: governance.html
       menu: 
-        - text: "Book Project"
+        - text: "Book Project: Good Governance"
           icon: fa-institution
           href: governance.html
-        - text: "Bihar"
+        - text: "Bihar Border Survey"
           icon: fa-map-pin
           href: bihar.html
         - text: "Brazil's Spatial Politics"
           icon: fa-map
-          href: map.html
+          href: http://200.18.49.110:3838/spatial2/
     - text: "Nigeria"
       icon: fa-flag
       href: nigeria.html
       menu: 
-        - text: "Polio Vaccination"
+        - text: "Polio Vaccination in Nigeria"
           icon: fa-eyedropper
           href: polio.html
-        - text: "MDGs"
+        - text: "MDGs Mapping"
           icon: fa-heartbeat
           href: mgds.html
-        - text: "Kaduna"
+        - text: "Kaduna Data Reform"
           icon: fa-users
           href: kaduna.html
     - text: "Data"

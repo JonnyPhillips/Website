@@ -10,10 +10,15 @@ navbar:
       icon: fa-institution
       href: governance.html
       menu: 
-        - text: "Governance"
+        - text: "Book Project"
+          icon: fa-institution
           href: governance.html
         - text: "Bihar"
+          icon: fa-map-pin
           href: bihar.html
+        - text: "Brazil's Spatial Politics"
+          icon: fa-map
+          href: map.html
     - text: "Nigeria"
       icon: fa-flag
       href: nigeria.html

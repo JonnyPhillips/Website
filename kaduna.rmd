@@ -1,5 +1,5 @@
 ---
-#title: "Kaduna"
+title: "Kaduna"
 #author: "JP"
 #date: "June 9, 2017"
 output: html_document

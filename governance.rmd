@@ -1,5 +1,5 @@
 ---
-title: "Good Governance in Poor Places"
+title: "Book Project: Good Governance in Poor Places"
 #author: "JP"
 #date: "June 6, 2017"
 output: html_document

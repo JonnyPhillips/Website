@@ -16,9 +16,16 @@ navbar:
         - text: "Bihar Border Survey"
           icon: fa-map-pin
           href: bihar.html
+    - text: "Brazil"
+      icon: fa-sun-o
+#      href: brazil_menu.html
+      menu:
         - text: "Brazil's Spatial Politics"
           icon: fa-map
           href: http://200.18.49.110:3838/spatial2/
+        - text: "Northeast Survey"
+          icon: angle-right
+          href: brazil_survey.html
     - text: "Nigeria"
       icon: fa-flag
       href: nigeria.html

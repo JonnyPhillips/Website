@@ -1,0 +1,8 @@
+---
+#title: "Brazil's Spatial Politics"
+#author: "JP"
+#date: "June 9, 2017"
+output: html_document
+---
+
+<iframe src="http://200.18.49.110:3838/spatial2/" style="border: none; width: 900px; height: 450px"></iframe>

@@ -1,0 +1,19 @@
+---
+title: "My Research"
+#author: "JP"
+#date: "May 13, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+My research focuses on understanding political change and the quality of democracy in developing countries. Specifically, when can citizens access public resources on the basis of needs and entitlements ('programmatically') and not solely based on their political connections (`clientelism')? Through subnational comparisons in my primary fieldwork sites in Brazil, Nigeria and India I seek to clarify the incentives that lead some politicians to focus on enforcing clear rules rather than diverting resources to political supporters. Through original surveys and innovative methods I seek to understand under what conditions citizens are empowered to vote freely and hold political elites accountable.
+
+I'm also interested in improving how political economy is communicated. That includes attempts at visualizing data as cubes or hexagons, a joint project with the University of Sao Paulo to map Brazil's electoral data, and collaboration with Kaduna State Government to rapidly increase their capability in electronic data collection and analysis. I've also learnt a huge amount through teaching classes in the Politics of Brazil, Political Economy of Africa and Microeconomics - Information Economics and Game Theory. 
+
+Currently I am studying for a PhD in Government at Harvard University. Previously I worked with a phenomenal team of civil servants to guide investments in the MDGs within Nigeria's Federal Government. I have also studied at SOAS and Oxford, worked for Oxera, and Vivid Economics, consulted for DFID and the World Bank and interned for Martin Horwood MP in the UK Parliament.
+
+###[CV](cv.pdf) -- [Lattes](http://lattes.cnpq.br/4097286915046638) -- [Google Scholar](https://scholar.google.ca/citations?hl=en&user=uHCbWZAAAAAJ&btnA=1&view_op=list_works&gmla=AJsN-F5iqpJZWBa3iYt08hG8wf-_iJuqp_nsY_7UhK2BlWCYvdjUiDyisHVovGGuFdPOfVGNDSk0kemkC5PNA2acF57ChJEg-6o5WperMK5_9Se6JpVzqE8) -- [Github](https://github.com/JonnyPhillips) -- [ORCID](http://www.orcid.org/0000-0002-3073-1045)
+

@@ -48,8 +48,6 @@ navbar:
     - text: "Publications"
       icon: fa-book
       href: pubs3.html
-    - text: "Leaflet"
-      href: leaflet.html
 output:
   html_document:
     theme: journal

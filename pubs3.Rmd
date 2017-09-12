@@ -1,0 +1,34 @@
+--- 
+title: "Publications"
+output: html_document
+---
+
+## Peer-Reviewed
+
+Grossman, S., Phillips, J., & Rosenzweig, L. R. (Forthcoming). [Opportunistic Accountability : State-Society Bargaining Over Shared Interests](http://journals.sagepub.com/doi/metrics/10.1177/0010414017720706). Comparative Political Studies, 1-31.
+
+Dhillon, R., & Phillips, J. (2015). [State Capability and Rwanda's Health Gains](https://doi.org/10.1016/S2214-109X(15)00008-X). Lancet Global Health. 
+
+Pan, J., Phillips, J., & Chen, Y. (2008). [China's Balance of Emissions Embodied in Trade: Approaches to Measurement and Allocating International Responsibility](https://doi.org/10.1093/oxrep/grn016). Oxford Review of Economic Policy, 24(2), 354-376. 
+
+## Working Papers
+
+Phillips, J. (2017), Can Bihar Break the Clientelist Trap? The Political Effects of Programmatic Development Policy. International Growth Centre.
+
+Asante, K., Ashon, M., Bates, Robert H., Duayeden, A.K.,
+Phillips, J., and Pwazaga, R. (2013). Information and Accountability for Public Services in Ghana, Harvard University.
+
+Diagne, A., Glover, S., Groom, B., & Phillips, J. (2012). [Africa's Green Revolution? Raising Awareness of New Rice Crops for Africa (NERICAs)](https://www.soas.ac.uk/economics/research/workingpapers/file76516.pdf). SOAS Department of Economics Working Paper Series 176.
+
+## Policy
+Jonathan Phillips. Restoring Confidence and Increasing Responsiveness in State and Local
+Government through Conditional Grants: The Experience of Nigeria.  Technical Report for Conference on Sub-national Jurisdictions in Efforts to Achieve the MDGs, May, 2009.
+
+Holt, D., Horncastle, A., Phillips, J. (2006). Capital Efficiency at Airports and Related Services. Utilities Policy, 14(4), 251-261.
+
+## Journalistic
+Phillips, J., Grossman, S., & Rosenzweig, L. (2016). Monkey Cage: Polio is back in Nigeria, and the next vaccination campaign may have a surprising consequence. [The Washington Post](https://www.washingtonpost.com/news/monkey-cage/wp/2016/08/23/polio-is-back-in-nigeria-heres-why-local-communities-will-bargain-hard-on-the-next-vaccination-surge/?utm{\_}term=.4ebe68d195f6).
+
+Diagne, A., Glover, S., Groom, B., & Phillips, J. (2014). Africa's Green Revolution? Raising Awareness of New Rice Crops for Africa (NERICAs). [World Financial Review](http://www.worldfinancialreview.com/?p=653), January. 
+
+Jonathan Phillips. [Sustainable - and Political - Development Goals. Outreach](outreach.stakeholderforum.org/fileadmin/files/OUTREACHINF1DAY4.pdf), (March), 2012.

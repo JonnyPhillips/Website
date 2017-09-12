@@ -1,0 +1,18 @@
+---
+title: "Teaching"
+#author: "JP"
+#date: "June 9, 2017"
+output: html_document
+---
+
+### Classes
+
+* Causal Inference in the Political Economy of Development (USP FLS6415) - [2017](https://jonnyphillips.github.io/FLS6415/)
+* Politics in Brazil (Gov1292) - [2013](http://isites.harvard.edu/icb/icb.do?keyword=k95573), [2014](http://isites.harvard.edu/icb/icb.do?keyword=k103760) 
+* Microeconomic Theory II - Game Theory and Information Economics (Econ 2020b) - [2013](http://isites.harvard.edu/icb/icb.do?keyword=k93465&pageid=icb.page568765), [2015](http://isites.harvard.edu/icb/icb.do?keyword=k105978)
+* Political Economy of Africa (Gov1197) - [2014](http://isites.harvard.edu/icb/icb.do?keyword=k99580)
+
+### Workshops
+
+* GIS for Accountability - [Slides](GIS_Slides.pdf)
+* Electronic Surveys- [Slides, Kaduna State](Survey_KDBS.pdf) - [NSF Survey, Bahia (Portuguese)](Survey_Slides_Bahia.pdf)

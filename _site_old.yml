@@ -1,0 +1,48 @@
+name: "Jonathan Phillips"
+output_dir: "."
+navbar:
+  title: "Jonathan Phillips"
+  left:
+    - text: "Home"
+      icon: fa-home
+      href: index.html
+    - text: "Governance"
+      icon: fa-institution
+      href: governance.html
+      menu: 
+        - text: "Book Project: Good Governance"
+          icon: fa-institution
+          href: governance.html
+        - text: "Bihar Border Survey"
+          icon: fa-map-pin
+          href: bihar.html
+        - text: "Brazil's Spatial Politics"
+          icon: fa-map
+          href: http://200.18.49.110:3838/spatial2/
+    - text: "Nigeria"
+      icon: fa-flag
+      href: nigeria.html
+      menu: 
+        - text: "Polio Vaccination in Nigeria"
+          icon: fa-eyedropper
+          href: polio.html
+        - text: "MDGs Mapping"
+          icon: fa-heartbeat
+          href: mgds.html
+        - text: "Kaduna Data Reform"
+          icon: fa-users
+          href: kaduna.html
+    - text: "Data"
+      icon: fa-area-chart
+      href: data.html
+    - text: "Teaching"
+      icon: fa-line-chart
+      href: teaching.html
+    - text: "Publications"
+      icon: fa-book
+      href: pubs3.html
+output:
+  html_document:
+    theme: journal
+    css: style.css
+    highlight: tango

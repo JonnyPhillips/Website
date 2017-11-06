@@ -1,0 +1,833 @@
+---
+title: "Kaduna State Poverty Mapping"
+date: "October 29, 2017"
+output: html_document
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+#rm(list=ls())
+knitr::opts_chunk$set(include=TRUE, echo=FALSE, warning=FALSE, message=FALSE, eval=FALSE)
+library(foreign)
+library(tidyverse)
+library(knitr)
+library(broom)
+library(stargazer)
+library(R.utils)
+library(raster)
+library(sf)
+library(leaflet)
+library(jpeg)
+library(ggmap)
+library(imager)
+library(glmnet)
+library(RColorBrewer)
+```
+
+
+1. Resources
+
+https://github.com/nealjean/predicting-poverty
+
+Anaconda - 
+
+Caffe - (pre-built)
+
+WB LSMS data - unzip to data/input/LSMS - http://econ.worldbank.org/WBSITE/EXTERNAL/EXTDEC/EXTRESEARCH/EXTLSMS/0,,contentMDK:23512006~pagePK:64168445~piPK:64168309~theSitePK:3358997,00.html
+
+DHS data - unzip to data/input/DHS - http://dhsprogram.com/data/dataset_admin/download-datasets.cfm
+
+(Download GDAL)
+
+2. Download Trained CNN Model
+
+https://www.dropbox.com/s/4cmfgay9gm2fyj6/predicting_poverty_trained.caffemodel?dl=0
+
+3. Download nightlights data
+
+```{r download_nighlights_data, eval=FALSE,cache=TRUE}
+# Downloads nightlights data (about 400 MB zipped and 750 MB unzipped per year), saves the relevant raster, then deletes unused files locally
+dir.create('../data/input/Nightlights')
+years <- 2013
+year <- 2013
+for (year in years){
+  url <- paste0('https://ngdc.noaa.gov/eog/data/web_data/v4composites/F18', year, '.v4.tar')
+  temp <- paste0('../data/input/Nightlights/', year)
+  dir.create(temp)
+  dest <- paste0(temp, '/F18', year, '.v4.tar')
+  download.file(url, dest) #Downloaded manual to avoid character error
+  untar(dest, exdir = temp)
+  file <- list.files(temp)
+  file <- file[substr(file, nchar(file)-27, nchar(file))=='stable_lights.avg_vis.tif.gz']
+  tif <- paste0(temp, '/', file)
+  file <- substr(file, 1, nchar(file)-3)
+  gunzip(tif, paste0(temp, '/', file))
+  unlink(paste0(temp, '/', list.files(temp)[list.files(temp)!=file]), recursive = T)
+  print(year)
+  rm(dest, file, temp, tif, url, year)
+}
+
+```
+
+4. Process Survey Data
+
+```{r process_survey_data, eval=FALSE, cache=TRUE}
+## PROCESS LSMS AND DHS DATA ##
+
+dir.create('../data/output/LSMS', showWarnings = F, recursive=T)
+dir.create('../data/output/DHS', showWarnings = F, recursive=T)
+
+# Assign each cluster the mean nightlights values over a 10 km^2 area centered on its provided coordinates
+nl <- function(df, year){
+  # ls.filter identifies the nine clusters we filtered out because of LandScan data availability in our analysis
+  ls.filter <- c(0.112190, -1.542321, -1.629748, -1.741995, -1.846039, -1.896059, -2.371342, -2.385341, -2.446988)
+  nl <- raster(paste0('../data/input/Nightlights/', year, '/', list.files(paste0('../data/input/Nightlights/', year))))
+  df2 <- subset(df, is.na(lat)==F & is.na(lon)==F & lat !=0 & lon != 0)
+  df2 <- unique(df2[,c('lat', 'lon')])
+  shape <- extent(c(range(c(df2$lon-0.5, df2$lon+0.5)),
+                    range(c(df2$lat-0.5, df2$lat+0.5))))
+  nl <- crop(nl, shape)
+  for (i in 1:nrow(df2)){
+    lat <- sort(c(df2$lat[i] - (180/pi)*(5000/6378137), df2$lat[i] + (180/pi)*(5000/6378137)))
+    lon <- sort(c(df2$lon[i] - (180/pi)*(5000/6378137)/cos(df2$lat[i]), df2$lon[i] + (180/pi)*(5000/6378137)/cos(df2$lat[i])))
+    ext <- extent(lon, lat)
+    nl.vals <- unlist(raster::extract(nl, ext))
+    nl.vals[nl.vals==255] <- NULL
+    df2$nl[i] <- mean(nl.vals, na.rm = T)
+    # Add a column to indicate whether cluster was one of the nine filtered out by LandScan data availability for our study
+    # This allows full replication of our data by subsetting survey data to sample == 1 as well as testing on the full survey sample
+    # Ultimately, our sample differs from the full sample by just one cluster in Uganda and one in Tanzania
+    df2$sample[i] <- if (round(df2$lat[i], 6) %in% ls.filter) 0 else 1
+  }
+  df <- merge(na.omit(df2), df, by = c('lat', 'lon'))
+  return(df)
+}
+
+# Aggregate household-level data to cluster level
+cluster <- function(df, dhs = F){
+  # Record how many households comprise each cluster
+  for (i in 1:nrow(df)){
+    sub <- subset(df, lat == df$lat[i] & lon == df$lon[i])
+    df$n[i] <- nrow(sub)
+  }
+  # Clustering for LSMS survey data
+  df <- if (dhs == FALSE)
+    df %>% dplyr::group_by(lat,lon) %>% dplyr::summarise(cons=mean(cons),nl=mean(nl),n=mean(n),sample=min(sample))
+
+    # Clustering for DHS survey data
+  else df %>% dplyr::group_by(lat,lon) %>% dplyr::summarise(wealthscore=mean(wealthscore),nl=mean(nl),n=mean(n),sample=min(sample))
+  
+  return(df)
+}
+
+#### Write LSMS Data ####
+
+## Nigeria ##
+nga13.cons <- read.dta('../data/input/LSMS/DATA/cons_agg_w2.dta')
+nga13.cons <- data.frame(hhid = nga13.cons$hhid, cons = nga13.cons$pcexp_dr_w2/365)
+nga13.cons$cons <- nga13.cons$cons*110.84/(79.53*100)
+nga13.geo <- read.dta('../data/input/LSMS/DATA/Geodata Wave 2/NGA_HouseholdGeovars_Y2.dta')
+nga13.coords <- data.frame(hhid = nga13.geo$hhid, lat = nga13.geo$LAT_DD_MOD, lon = nga13.geo$LON_DD_MOD)
+nga13.rururb <- data.frame(hhid = nga13.geo$hhid, rururb = nga13.geo$sector, stringsAsFactors = F)
+nga13.weight <- read.dta('../data/input/LSMS/DATA/HHTrack.dta')[,c('hhid', 'wt_wave2')]
+names(nga13.weight)[2] <- 'weight'
+nga13.phhh8 <- read.dta('../data/input/LSMS/DATA/Post Harvest Wave 2/Household/sect8_harvestw2.dta')
+nga13.room <- data.frame(hhid = nga13.phhh8$hhid, room = nga13.phhh8$s8q9)
+nga13.metal <- data.frame(hhid = nga13.phhh8$hhid, metal = nga13.phhh8$s8q7=='IRON SHEETS')
+
+nga13.vars <- list(nga13.cons, nga13.coords, nga13.rururb, nga13.weight, nga13.room, nga13.metal) %>%
+  Reduce(function(x, y) merge(x, y, by = 'hhid'), .) %>%
+  nl(2013)
+
+write.table(nga13.vars, '../data/output/LSMS/Nigeria 2013 LSMS (Household).txt', row.names = F)
+write.table(cluster(nga13.vars), '../data/output/LSMS/Nigeria 2013 LSMS (Cluster).txt', row.names = F)
+
+
+#### Write DHS Data ####
+path <- function(iso){
+  return(paste0('../data/input/DHS/',list.files('../data/input/DHS')[substr(list.files('../data/input/DHS'),1,2)==iso], '/'))
+}
+
+vars <- c('001', '005', 271)
+vars <- c('hhid', paste0('hv', vars))
+names <- c('hhid', 'cluster', 'weight', 'wealthscore')
+
+# Nigeria 2013
+
+nga13.dhs <- read.dta(paste0(path('NG'),'nghr6adt/NGHR6AFL.DTA'), convert.factors = NA) %>%
+  subset(select = vars)
+names(nga13.dhs) <- names
+
+nga13.coords <- read.dbf(paste0(path('NG'),'ngge6afl/NGGE6AFL.dbf'))[,c('DHSCLUST', 'LATNUM', 'LONGNUM')]
+names(nga13.coords) <- c('cluster', 'lat', 'lon')
+
+nga13.dhs <- merge(nga13.dhs, nga13.coords, by = 'cluster') %>%
+  nl(2013)
+
+write.table(nga13.dhs, '../data/output/DHS/Nigeria 2013 DHS (Household).txt', row.names = F)
+write.table(cluster(nga13.dhs, T), '../data/output/DHS/Nigeria 2013 DHS (Cluster).txt', row.names = F)
+
+```
+
+5. Save Survey Data
+```{r engine='python', engine.path="C:/ProgramData/Anaconda2/python.exe", eval=FALSE, results='asis', cache=TRUE}
+import numpy as np
+import pandas as pd
+import os
+
+def retrieve_and_save(countries, fns, out_dir, names, keys, sample=True):
+  for idx, country in enumerate(countries):
+    df = pd.read_csv(fns[idx], sep=' ')
+    if sample:
+      df = df[df["sample"]==1]
+    df = df[(df.lat!=0) & (df.lon!=0)]
+    for name, key in zip(names, keys):
+      if not os.path.exists(os.path.join(out_dir, country)):
+        os.makedirs(os.path.join(out_dir, country))
+      np.save(os.path.join(out_dir, country, name), df[key])
+    if idx == 0:
+      pooled = df.copy()
+    else:
+      pooled = pooled.append(df)
+
+  for name, key in zip(names, keys):
+    if not os.path.exists(os.path.join(out_dir, 'pooled')):
+        os.makedirs(os.path.join(out_dir, 'pooled'))
+    np.save(os.path.join(out_dir, 'pooled', name), pooled[key])
+
+
+if __name__ == '__main__':
+  '''
+  The set of samples used in the paper was not quite the full set due to missing Landscan data (1 less cluster in Uganda LSMS, 8 less clusters in Tanzania LSMS). Set this variable to True to use the same set of household clusters, set to False to use the full set of household clusters.
+  '''
+  sample = True
+
+  ############################
+  ############ DHS ###########
+  ############################
+
+  countries = ['nigeria']
+  fns = ['../data/output/DHS/Nigeria 2013 DHS (Cluster).txt']
+  out_dir = '../data/output/DHS/'
+  names = ['lats', 'lons', 'assets', 'nightlights', 'households']
+  keys = ['lat', 'lon', 'wealthscore', 'nl', 'n']
+  retrieve_and_save(countries, fns, out_dir, names, keys, sample=sample)
+
+  ############################
+  ############ LSMS ##########
+  ############################
+
+  countries = ['nigeria']
+  fns = ['../data/output/LSMS/Nigeria 2013 LSMS (Cluster).txt']
+  out_dir = '../data/output/LSMS/'
+  names = ['lats', 'lons', 'consumptions', 'nightlights', 'households']
+  keys = ['lat', 'lon', 'cons', 'nl', 'n']
+  retrieve_and_save(countries, fns, out_dir, names, keys, sample=sample)
+
+```
+
+6. Identify existing survey cluster download locations
+
+```{r engine='python', engine.path="C:/ProgramData/Anaconda2/python.exe", eval=FALSE, results='asis', cache=TRUE}
+import os
+import numpy as np
+from osgeo import gdal, osr
+
+'''
+Generates the image locations to download for a set of cluster locations.
+The image locations are taken from a 10x10km area around the cluster
+location. For every country except Nigeria and Tanzania, we take 100
+1x1km images. For Nigeria and Tanzania, we take 25 1kmx1km images per
+cluster.
+'''
+
+def get_download_locations(countries, cluster_loc_dir, nightlight_tif):
+  for country in countries:
+    cluster_lats = np.load(os.path.join(cluster_loc_dir,
+                                        country, 'lats.npy'))
+    cluster_lons = np.load(os.path.join(cluster_loc_dir,
+                                        country, 'lons.npy'))
+    clusters = [(cluster_lats[i], cluster_lons[i])
+                for i in xrange(cluster_lats.size)]
+    top_lefts = [(lat + 0.045, lon - 0.045) for lat, lon in clusters]
+    bottom_rights = [(lat - 0.045, lon + 0.045) for lat, lon in clusters]
+    top_left_pixellocs = locsToPixels(nightlight_tif, top_lefts)
+    bottom_right_pixellocs = locsToPixels(nightlight_tif, bottom_rights)
+    output_cluster_locs = []
+    output_pix = []
+    for i in xrange(len(clusters)):
+      top_left = top_left_pixellocs[i]
+      bottom_right = bottom_right_pixellocs[i]
+      for x in xrange(top_left[0], bottom_right[0]):
+        for y in xrange(top_left[1], bottom_right[1]):
+          if country == 'nigeria' or country == 'tanzania':
+            if x % 2 == 1 or y % 2 == 1:
+              continue
+          output_pix.append((x, y))
+          output_cluster_locs.append(clusters[i])
+    output_locs = pixelsToCoords(nightlight_tif, output_pix)
+    print("%d locations saved for %s" % (len(output_locs), country))
+    with open(os.path.join(cluster_loc_dir, country, 'candidate_download_locs_survey.txt'), 'w') as f:
+      for loc, cluster_loc in zip(output_locs, output_cluster_locs):
+        f.write("%f %f %f %f\n" % (loc[0], loc[1], cluster_loc[0], cluster_loc[1]))
+
+
+def latLon2Pixel(lat, lon, ct, gt):
+  (lon, lat, holder) = ct.TransformPoint(lon, lat)
+  x = (lon-gt[0])/gt[1]
+  y = (lat-gt[3])/gt[5]
+  return (int(x), int(y))
+
+
+def locsToPixels(srcAddr, latLonPairs):
+  ds = gdal.Open(srcAddr)
+  gt = ds.GetGeoTransform()
+  srs = osr.SpatialReference()
+  srs.ImportFromWkt(ds.GetProjection())
+  srsLatLong = srs.CloneGeogCS()
+  ct = osr.CoordinateTransformation(srsLatLong, srs)
+  pixelPairs = []
+  for point in latLonPairs:
+    lat, lon = point
+    pixelPairs.append(latLon2Pixel(lat, lon, ct, gt))
+  return pixelPairs
+
+
+def pixel2coord(x, y, xoff, a, b, yoff, d, e):
+  xp = a * x + b * y + xoff
+  yp = d * x + e * y + yoff
+  return (yp, xp)
+
+
+def pixelsToCoords(srcAddr, pixelPairs):
+  ds = gdal.Open(srcAddr)
+  xoff, a, b, yoff, d, e = ds.GetGeoTransform()
+  latLonPairs = []
+  for pixel in pixelPairs:
+    x, y = pixel
+    latLonPairs.append(pixel2coord(x + 0.5, y + 0.5, xoff, a, b, yoff, d, e))
+  return latLonPairs
+
+
+if __name__ == '__main__':
+  nightlight_tif = "../data/input/Nightlights/2013/F182013.v4c_web.stable_lights.avg_vis.tif"
+
+  # DHS
+  print("Generating candidate image locations for DHS")
+  countries = ['nigeria']
+  cluster_loc_dir = '../data/output/DHS'
+  get_download_locations(countries, cluster_loc_dir, nightlight_tif)
+
+  # LSMS
+  print("Generating candidate image locations for LSMS")
+  countries = ['nigeria']
+  cluster_loc_dir = '../data/output/LSMS'
+  get_download_locations(countries, cluster_loc_dir, nightlight_tif)
+
+```
+
+7. Generate Kaduna Grid for sampled points
+
+```{r kaduna_sampling_grid, eval=TRUE, cache=TRUE}
+#Load Kd shapefile
+
+Ng_states <- st_read("../data\\input\\Shapefiles\\States\\States.shp")
+Kd <- Ng_states %>% filter(State_name=="Kaduna") %>% st_as_sf()
+
+#Create grid of points in bounding box
+limits <- st_bbox(Kd) %>% round(2)
+xrange <- seq(limits["xmin"],limits["xmax"],by=0.015)
+yrange <- seq(limits["ymin"],limits["ymax"],by=0.015)
+
+points <- expand.grid(xrange,yrange)
+names(points) <- c("long","lat")
+
+Grid <- SpatialPoints(points,proj4string=as(Kd,"Spatial")@proj4string)
+Grid2 <- st_as_sf(Grid)
+
+#Clip to Kaduna shapefile extent
+Grid_subset <- Grid2[Kd,]
+#plot(Grid_subset)
+
+locations <- coordinates(as(Grid_subset,"Spatial"))
+locations <- as.data.frame(cbind(locations[,2],locations[,1],locations[,2],locations[,1]))
+names(locations) <- c("image_lat","image_long","cluster_lat","cluster_long")
+
+#leaflet() %>% addProviderTiles("CartoDB.Positron") %>% clearBounds() %>% addCircles(data=locations,~cluster_long,~cluster_lat)
+
+write.table(locations,file=paste0("../data\\output\\New\\nigeria\\","candidate_downloaded_locs_kd.txt"),row.names=FALSE,col.names=FALSE,quote=FALSE)
+
+```
+
+The sample grid of daytime satellite images for Kaduna is `r length(Grid_subset)` evenly spaced points, currently not targeted to specific communities. Daytime images are approximately 1km x 1km, 400x400 pixel RGB images (Google maps zoom level 16) centered on each grid point. 
+
+
+8. Download daytime image locations
+
+```{r download_day_images, eval=FALSE}
+DHS_locations <- read.table("../data\\output\\DHS\\nigeria\\candidate_download_locs_survey.txt")
+names(DHS_locations) <- c("image_lat","image_long","cluster_lat","cluster_long")
+DHS_locations[,"image_path"] <- NA
+#DHS_locations <- DHS_locations %>% slice(1:200)
+
+LSMS_locations <- read.table("../data\\output\\LSMS\\nigeria\\candidate_download_locs_survey.txt")
+names(LSMS_locations) <- c("image_lat","image_long","cluster_lat","cluster_long")
+LSMS_locations[,"image_path"] <- NA
+#LSMS_locations <- LSMS_locations %>% slice(1:200)
+
+locations_kd <- read.table("../data\\output\\New\\nigeria\\candidate_downloaded_locs_kd.txt")
+names(locations_kd) <- c("image_lat","image_long","cluster_lat","cluster_long")
+locations_kd[,"image_path"] <- NA
+#locations_kd <- locations_kd %>% slice(1:200)
+
+all_locations <- list(DHS_locations=DHS_locations,LSMS_locations=LSMS_locations,locations_kd=locations_kd)
+types_locations <- c("DHS","LSMS","New")
+dir_locations <- "../data\\input\\Day_Images\\"
+
+for (L in 1:length(all_locations)){
+  num_locations <- dim(all_locations[[L]])[1]
+  pb <- winProgressBar(title="Progress bar", label="0% done", min=0, max=100, initial=0)
+  for (i in 1:num_locations){
+    setWinProgressBar(pb, i/(num_locations)*100, label="test")
+    #print(paste0(names(all_locations)[L]," - ",i))
+    img_name <- paste0("img_",types_locations[L],"_",i,".jpg")
+    filename <- paste0(dir_locations,types_locations[L],"\\",img_name)
+    if (!(file.exists(filename))){
+    #if(img_name %in% list.files(paste0(dir_locations,types_locations[L]))==FALSE){
+      current_img <- get_googlemap(center=c(as.numeric(all_locations[[L]][i,"image_long"]),as.numeric(all_locations[[L]][i,"image_lat"])),zoom=16,size=c(400,600),scale=1,maptype="satellite",filename=img_name, key="AIzaSyCP4vp0HHdfrSEc2AwUM0nUbGT4C8fgdd8")
+      current_map <- ggmap(current_img,extent="device")
+      ggsave(filename,current_map,device="jpeg",width=400/300,height=600/300)
+      temp_image <- load.image(filename)
+      cropped_image <- crop.borders(temp_image,nx=0,ny=100,nz=0)
+      save.image(cropped_image,filename)
+    }
+    
+    all_locations[[L]][i,"image_path"] <- filename
+  }
+table_locations <- all_locations[[L]] %>% dplyr::select(image_path,image_lat,image_long,cluster_lat,cluster_long)
+write.table(table_locations,file=paste0("../data\\output\\",types_locations[L],"\\nigeria\\downloaded_locs_kd.txt"),row.names=FALSE,col.names=FALSE,quote=FALSE)
+
+lats_lons <- table_locations %>% dplyr::select(cluster_lat,cluster_long)
+write.table(lats_lons[,"cluster_lat"],paste0("../data\\output\\New\\nigeria\\lats_gen.csv"), col.names=FALSE, row.names=FALSE)
+write.table(lats_lons[,"cluster_long"],paste0("../data\\output\\New\\nigeria\\lons_gen.csv"), col.names=FALSE, row.names=FALSE)
+}
+```
+
+9. Save lats-lons numpy for new points
+
+```{r save_lats_lons, engine='python', engine.path="C:/ProgramData/Anaconda2/python.exe", eval=FALSE, results='asis'}
+import os
+import numpy as np
+
+os.chdir('C:/Users/Jonny/Google Drive/Consultancy Work/Kaduna/Planning/Poverty Mapping/Burke Project Github/Second_Effort')
+
+country = 'nigeria'
+new_dir = 'data\output\New'
+
+from numpy import genfromtxt
+new_lats = genfromtxt(os.path.join(new_dir,country,"lats_gen.csv"), delimiter=',')
+new_lons = genfromtxt(os.path.join(new_dir,country,"lons_gen.csv"), delimiter=',')
+
+np.save(os.path.join(new_dir,country, 'lats'), new_lats)
+np.save(os.path.join(new_dir,country, 'lons'), new_lons)
+
+```
+
+10. Extract Image Features
+
+```{r extract_features, engine='python', engine.path="C:/ProgramData/Anaconda2/python.exe", eval=FALSE, results='asis'}
+import numpy as np
+import math
+import os
+from scipy.misc import imread
+import caffe
+
+os.chdir('C:/Users/Jonny/Google Drive/Consultancy Work/Kaduna/Planning/Poverty Mapping/Burke Project Github/Second_Effort')
+
+# If using GPU, set to True
+GPU = False
+if GPU:
+  caffe.set_mode_gpu()
+  caffe.set_device(0)
+else:
+  caffe.set_mode_cpu()
+
+
+def get_features(net, locs_file):
+  '''
+  Runs the forward pass of the neural net on every image.
+  '''
+  img_cluster_locs, num_images = get_locs_info(locs_file)
+  num_batches = math.ceil(num_images / 32.0)
+  raw_features = []
+  batch_num = 0
+  with open(locs_file, 'r') as f:
+    curr_batch = []
+    for line in f:
+      img_path = line.split()[0]
+      # reads a RGB image
+      input_img = imread(img_path).astype(np.float32)
+      # convert to BGR
+      input_img = input_img[:, :, [2, 1, 0]]
+      # convert to D,H,W
+      input_img = np.transpose(input_img, [2, 0, 1])
+      # subtract the mean
+      mean_bgr = [103.334, 107.8797, 107.4072]
+      for i in xrange(0, 3):
+        input_img[i, :, :] = input_img[i, :, :] - mean_bgr[i]
+      curr_batch.append(input_img)
+
+      if len(curr_batch) == 32:
+        batch_num += 1
+        print("Batch %d/%d for %s" % (batch_num,
+                                      num_batches, locs_file))
+        curr_batch = np.asarray(curr_batch)
+        net.blobs['data'].data[...] = curr_batch
+        net.forward()
+        raw_features.append(net.blobs['conv7'].data)
+        curr_batch = []
+        model_file = '../model/predicting_poverty_deploy.prototxt'
+        weights_file = '../model/predicting_poverty_trained.caffemodel'
+        net = caffe.Net(model_file, weights_file, caffe.TEST)
+        
+    if len(curr_batch) > 0:
+      batch_num += 1
+      print("Batch %d/%d for %s" % (batch_num, num_batches, locs_file))
+      curr_batch = np.asarray(curr_batch)
+      batch_size = curr_batch.shape[0]
+      #np.zeros((32 - batch_size, 3, 400, 400)).astype(np.float32).shape  #Last two dimensions are different from those of curr.batch
+      # pad end batch
+      curr_batch = np.vstack((curr_batch, np.zeros((32 - batch_size, 3, 400, 400)).astype(np.float32)))
+      net.blobs['data'].data[...] = curr_batch
+      net.forward()
+      raw_features.append(net.blobs['conv7'].data[:batch_size])
+      model_file = '../model/predicting_poverty_deploy.prototxt'
+      weights_file = '../model/predicting_poverty_trained.caffemodel'
+      net = caffe.Net(model_file, weights_file, caffe.TEST)
+  raw_features = np.vstack(raw_features)
+  # average pooling
+  n, f, h, w = raw_features.shape
+  features = raw_features.reshape(n, f, h*w)
+  features = np.mean(features, axis=2)
+  return features, img_cluster_locs
+
+
+def aggregate_features(features, img_cluster_locs, clusters):
+  '''
+  Aggregate features by cluster by taking the mean.
+  Respects the cluster ordering given by lats.npy and lons.npy.
+  '''
+  # average the features in the same cluster
+  conv_features = []
+  image_counts = []
+  for cluster in clusters:
+    cluster_mask = [(img_cluster == cluster) for img_cluster in img_cluster_locs]
+    cluster_mask = np.asarray(cluster_mask)
+    image_count = np.sum(cluster_mask)
+    # if count is 0, fill with a 0 feature
+    if image_count == 0:
+      mean_cluster_feature = np.zeros(features.shape[1])
+    else:
+      mean_cluster_feature = np.mean(features[cluster_mask], axis=0)
+    conv_features.append(mean_cluster_feature)
+    image_counts.append(image_count)
+  conv_features = np.asarray(conv_features)
+  image_counts = np.asarray(image_counts)
+  return conv_features, image_counts
+
+
+def extract(net, countries, output_dir):
+  '''
+  Runs the forward pass of the CNN on every image and then
+  aggregates the features by cluster by taking the mean.
+  '''
+  for country in countries:
+    print("Extracting %s for %s" % (country, output_dir))
+    locs_file = os.path.join(output_dir, country, 'downloaded_locs_kd.txt')
+
+    # compute conv features for every image
+    features, img_cluster_locs = get_features(net, locs_file)
+
+    # get the master cluster ordering
+    cluster_lats = np.load(os.path.join(output_dir, country, 'lats.npy'))
+    cluster_lons = np.load(os.path.join(output_dir, country, 'lons.npy'))
+    # bit of a hack here - cluster locations can be changed when
+    # writing to a file using format string
+    clusters = [(float("%f" % cluster_lats[i]), float("%f" % cluster_lons[i])) for i in xrange(cluster_lats.size)]
+
+    # aggregate features by cluster
+    conv_features, image_counts = aggregate_features(features, img_cluster_locs, clusters)
+
+    conv_features_path = os.path.join(output_dir, country, 'conv_features')
+    image_counts_path = os.path.join(output_dir, country, 'image_counts')
+    np.save(conv_features_path, conv_features)
+    np.save(image_counts_path, image_counts)
+
+
+def get_locs_info(locs_file):
+  '''
+  Get the cluster location for each image and compute the number of
+  images.
+  '''
+  img_cluster_locs = []
+  num_images = 0
+  with open(locs_file, 'r') as f:
+    for line in f:
+      num_images += 1
+      img_path, lat, lon, cluster_lat, cluster_lon = line.split()
+      cluster_loc = (float(cluster_lat), float(cluster_lon))
+      img_cluster_locs.append(cluster_loc)
+  return img_cluster_locs, num_images
+
+
+if __name__ == '__main__':
+  model_file = '../model/predicting_poverty_deploy.prototxt'
+  weights_file = '../model/predicting_poverty_trained.caffemodel'
+  net = caffe.Net(model_file, weights_file, caffe.TEST)
+
+  # DHS
+  print("Extracting features for DHS")
+  countries = ['nigeria']
+  dhs_dir = '../data/output/DHS'
+  extract(net, countries, dhs_dir)
+
+  # LSMS
+  print("Extracting features for LSMS")
+  countries = ['nigeria']
+  lsms_dir = '../data/output/LSMS'
+  extract(net, countries, lsms_dir)
+
+  # New Data
+  print("Extracting features for New Target   Points")
+  countries = ['nigeria']
+  new_dir = '../data/output/New'
+  extract(net, countries, new_dir)
+  
+  
+  
+```
+
+12. Scale and Organize Analysis Data
+
+```{r scale_organize, engine='python', engine.path="C:/ProgramData/Anaconda2/python.exe", eval=FALSE, results='asis'}
+import os
+import numpy as np
+from sklearn.preprocessing import StandardScaler
+from sklearn import cross_validation, linear_model
+
+os.chdir('C:/Users/Jonny/Google Drive/Consultancy Work/Kaduna/Planning/Poverty Mapping/Burke Project Github/Second_Effort')
+
+X_scaler = StandardScaler(with_mean=True, with_std=False)
+
+X_LSMS = np.load('../data/output/LSMS/nigeria/conv_features.npy')
+X_LSMS_scaled = X_scaler.fit_transform(X_LSMS)
+np.savetxt("../analysis/X_LSMS.csv", X_LSMS_scaled, delimiter=",")
+
+y_LSMS = np.load('../data/output/LSMS/nigeria/consumptions.npy')
+np.savetxt("../analysis/y_LSMS.csv", y_LSMS, delimiter=",")
+
+X_DHS = np.load('../data/output/DHS/nigeria/conv_features.npy')
+X_DHS_scaled = X_scaler.fit_transform(X_DHS)
+np.savetxt("../analysis/X_DHS.csv", X_DHS_scaled, delimiter=",")
+
+y_DHS = np.load('../data/output/DHS/nigeria/assets.npy')
+np.savetxt("../analysis/y_DHS.csv", y_DHS, delimiter=",")
+
+X_New = np.load('../data/output/New/nigeria/conv_features.npy')
+X_New_scaled = X_scaler.fit_transform(X_New)
+np.savetxt("../analysis/X_New.csv", X_New_scaled, delimiter=",")
+#np.savetxt("analysis/X_New.csv", X_New, delimiter=",") #In case X_new should have been unscaled, but no dif...
+```
+
+13. Ridge Regression for Original Points
+
+```{r, ridge_regression, eval=TRUE, cache=TRUE}
+X_LSMS <- as.matrix(read.csv("../analysis/X_LSMS.csv",header=FALSE))
+
+y_LSMS <- read.csv("../analysis/y_LSMS.csv",header=FALSE)
+y_LSMS <- as.numeric(unlist(y_LSMS))
+
+X_DHS <- as.matrix(read.csv("../analysis/X_DHS.csv",header=FALSE))
+
+y_DHS <- read.csv("../analysis/y_DHS.csv",header=FALSE)
+y_DHS <- as.numeric(unlist(y_DHS))
+
+lambdas <- 10^seq(3, -2, by = -.1)
+
+cv_fit_LSMS <- cv.glmnet(x=X_LSMS,y=y_LSMS,alpha=0,lambda=lambdas)
+opt_lambda_LSMS <- cv_fit_LSMS$lambda.min
+fit_LSMS <- cv_fit_LSMS$glmnet.fit
+predictions_LSMS <- predict(fit_LSMS, s=opt_lambda_LSMS, newx=X_LSMS)
+plot(density(predictions_LSMS))
+
+cv_fit_DHS <- cv.glmnet(x=X_DHS,y=y_DHS,alpha=0,lambda=lambdas)
+opt_lambda_DHS <- cv_fit_DHS$lambda.min
+fit_DHS <- cv_fit_DHS$glmnet.fit
+predictions_DHS <- predict(fit_DHS, s=opt_lambda_DHS, newx=X_DHS)
+plot(density(predictions_DHS))
+
+```
+
+14. Mapping of results for Original Points
+
+```{r map_results, eval=TRUE, cache=TRUE}
+###Double-check these are correct cluster locations using lats.npy and lons.npy
+
+locations_DHS <- read.table(file=paste0("../data\\output\\DHS\\nigeria\\","downloaded_locs_kd.txt"))
+locations_DHS <- locations_DHS %>% dplyr::rename(lat=V4,long=V5) %>% dplyr::select(lat,long)  %>% distinct(lat,long)
+
+locations_LSMS <- read.table(file=paste0("../data\\output\\LSMS\\nigeria\\","downloaded_locs_kd.txt"))
+locations_LSMS <- locations_LSMS %>% dplyr::rename(lat=V4,long=V5) %>% dplyr::select(lat,long)  %>% distinct(lat,long)
+
+#locations_DHS <- read.csv(paste0("data\\output\\DHS\\nigeria\\","downloaded_locs_kd.txt"))
+
+predictions_LSMS <- data.frame(predictions_LSMS) %>% dplyr::rename(Prediction_LSMS=X1)
+predictions_DHS <- data.frame(predictions_DHS) %>% dplyr::rename(Prediction_DHS=X1)
+
+combined_DHS <- as.data.frame(cbind(locations_DHS,predictions_DHS))
+
+combined_LSMS <- as.data.frame(cbind(locations_LSMS,predictions_LSMS))
+
+pal_LSMS <- colorNumeric(
+  palette = 'Reds',
+  domain = combined_LSMS$Prediction_LSMS
+)
+
+pal_DHS <- colorNumeric(
+  palette = 'Blues',
+  domain = combined_DHS$Prediction_DHS
+)
+
+```
+
+LSMS Predictions
+```{r LSMS_pred, eval=TRUE}
+leaflet() %>% addProviderTiles("CartoDB.Positron") %>% clearBounds() %>% addCircles(data=combined_LSMS,~long,~lat,fillColor=~pal_LSMS(Prediction_LSMS),radius=5000,stroke=FALSE,fillOpacity=0.7,opacity=0.7, weight=10,color=~pal_LSMS(Prediction_LSMS))
+```
+
+DHS Predictions
+```{r DHS_pred, eval=TRUE}
+leaflet() %>% addProviderTiles("CartoDB.Positron") %>% clearBounds() %>% addCircles(data=combined_DHS,~long,~lat,fillColor=~pal_DHS(Prediction_DHS),radius=5000,stroke=FALSE,fillOpacity=0.7,opacity=0.7, weight=10,color=~pal_DHS(Prediction_DHS))
+
+```
+
+15. Ridge Regression for New Predictions
+
+```{r, ridge_regression_new, eval=TRUE, cache=TRUE}
+X_new <- as.matrix(read.csv("../analysis/X_new.csv",header=FALSE))
+
+lambdas <- 10^seq(3, -2, by = -.1)
+
+cv_fit_LSMS <- cv.glmnet(x=X_LSMS,y=y_LSMS,alpha=0,lambda=lambdas)
+opt_lambda_LSMS <- cv_fit_LSMS$lambda.min
+fit_LSMS <- cv_fit_LSMS$glmnet.fit
+predictions_LSMS <- predict(fit_LSMS, s=opt_lambda_LSMS, newx=X_new)
+plot(density(predictions_LSMS,na.rm=TRUE))
+
+cv_fit_DHS <- cv.glmnet(x=X_DHS,y=y_DHS,alpha=0,lambda=lambdas)
+opt_lambda_DHS <- cv_fit_DHS$lambda.min
+fit_DHS <- cv_fit_DHS$glmnet.fit
+predictions_DHS <- predict(fit_DHS, s=opt_lambda_DHS, newx=X_new)
+plot(density(predictions_DHS,na.rm=TRUE))
+
+```
+
+16. Mapping of results for New Predictions
+
+```{r map_results_new, eval=TRUE, cache=TRUE}
+locations <- read.table(file=paste0("../data\\output\\New\\nigeria\\","downloaded_locs_kd.txt"))
+locations <- locations %>% dplyr::rename(lat=V4,long=V5) %>% dplyr::select(long,lat)
+
+predictions_LSMS <- data.frame(predictions_LSMS) %>% dplyr::rename(Prediction_LSMS=X1)
+predictions_DHS <- data.frame(predictions_DHS) %>% dplyr::rename(Prediction_DHS=X1)
+
+combined <- as.data.frame(cbind(locations,predictions_LSMS,predictions_DHS))
+#combined <- as.data.frame(cbind(locations,predictions_LSMS))
+
+pal_LSMS <- colorNumeric(
+  palette = 'Reds',
+  domain = combined$Prediction_LSMS
+)
+
+pal_DHS <- colorNumeric(
+  palette = 'Blues',
+  domain = combined$Prediction_DHS
+)
+
+```
+
+LSMS Predictions
+```{r LSMS_pred_new, eval=TRUE}
+leaflet() %>% addProviderTiles("CartoDB.Positron") %>% clearBounds() %>% addCircles(data=combined,~long,~lat,fillColor=~pal_LSMS(Prediction_LSMS),color=~pal_LSMS(Prediction_LSMS),radius=800,stroke=FALSE,fillOpacity=0.7,opacity=0.7, weight=5)
+
+```
+
+DHS Predictions
+```{r DHS_pred_new, eval=TRUE}
+leaflet() %>% addProviderTiles("CartoDB.Positron") %>% clearBounds() %>% addCircles(data=combined,~long,~lat,fillColor=~pal_DHS(Prediction_DHS),radius=400,stroke=TRUE,fillOpacity=0.4,opacity=0.05, weight=5)
+
+```
+
+```{r Interpolate_LSMS, eval=FALSE}
+library(gstat)
+library(maptools)
+
+Ng_states <- st_read("C:\\Users\\Jonny\\Google Drive\\Nigeria - ODI\\Data Sources\\Consolidated Data\\Administrative Boundaries\\States\\States.shp")
+Kd <- Ng_states %>% filter(State_name=="Kaduna") %>% st_as_sf()
+
+combined_sp <- SpatialPointsDataFrame(coords=combined[,c(1,2)],data=combined,proj4string=as(Ng_states,"Spatial")@proj4string)
+
+variog_LSMS <- variogram(Prediction_LSMS~1,data=combined_sp)
+#plot(variog_LSMS)
+
+range_LSMS <- 49.6
+sill_LSMS <- 1.383
+nugget_LSMS <- 1.05
+psill_LSMS <- sill_LSMS - nugget_LSMS
+
+model_variog_LSMS <- vgm(psill=psill_LSMS,model="Exp",nugget=nugget_LSMS,range=range_LSMS)
+fit.variog_LSMS <- fit.variogram(variog_LSMS,model_variog_LSMS)
+#plot(variog_LSMS,fit.variog_LSMS)
+
+
+limits <- st_bbox(Kd) %>% round(2)
+xrange <- seq(limits["xmin"],limits["xmax"],by=0.01)
+yrange <- seq(limits["ymin"],limits["ymax"],by=0.01)
+
+points <- expand.grid(xrange,yrange)
+names(points) <- c("long","lat") #Double-check
+
+Grid <- SpatialPoints(points,proj4string=as(Ng_states,"Spatial")@proj4string)
+Kd_sp <- as(Kd,"Spatial")
+Grid_subset <- Grid[Kd_sp,]
+#plot(Grid_subset)
+
+idw_out <- idw(Prediction_LSMS~1,locations=combined_sp,newdata=Grid_subset,idp=0.1)
+idw_output <- as.data.frame(idw_out)
+names(idw_output)[1:3] <- c("long","lat","var1.pred")
+
+ggplot() + geom_tile(data=idw_output,aes(x=long,y=lat,fill=var1.pred)) + coord_equal() + theme_classic() + scale_fill_gradient(low="white",high="blue") + theme(axis.line=element_blank(),axis.text.x=element_blank(),
+          axis.text.y=element_blank(),axis.ticks=element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank(),
+          panel.background=element_blank(),panel.border=element_blank(),panel.grid.major=element_blank(),
+          panel.grid.minor=element_blank(),plot.background=element_blank())
+
+#Grey points suggest missing data?? NaN...
+
+#For dense point predictions, need to use nmax to avoid running out of memory/time:
+krig_LSMS <- krige(Prediction_LSMS~1, locations=combined_sp,newdata=Grid_subset,model=model_variog_LSMS,nmax=20)
+krig_LSMS_df <- as.data.frame(krig_LSMS)
+names(krig_LSMS_df)[1:3]<-c("long","lat","var1.pred")
+
+krig_LSMS_df %>% ggplot() + geom_tile(aes(x=long,y=lat,fill=var1.pred)) + scale_fill_gradient(low="white",high="blue") + theme_classic() + theme(axis.line=element_blank(),axis.text.x=element_blank(),
+          axis.text.y=element_blank(),axis.ticks=element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank(),
+          panel.background=element_blank(),panel.border=element_blank(),panel.grid.major=element_blank(),
+          panel.grid.minor=element_blank(),plot.background=element_blank()) + coord_equal()
+
+ggsave("LSMS_predicted_Kd_kriging.png")
+
+```
+
+![Interpolated (kriging) predictions.](LSMS_predicted_Kd_kriging.png)

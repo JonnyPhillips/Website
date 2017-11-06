@@ -26,23 +26,17 @@ library(RColorBrewer)
 
 1. Resources
 
-https://github.com/nealjean/predicting-poverty
+- Main Machine Learning Project page: https://github.com/nealjean/predicting-poverty
 
-Anaconda - 
+- Tools used: Anaconda, Caffe (pre-built), GDAL downloaded
 
-Caffe - (pre-built)
+- [WB LSMS data](http://econ.worldbank.org/WBSITE/EXTERNAL/EXTDEC/EXTRESEARCH/EXTLSMS/0,,contentMDK:23512006~pagePK:64168445~piPK:64168309~theSitePK:3358997,00.html) - unzip to data/input/LSMS
 
-WB LSMS data - unzip to data/input/LSMS - http://econ.worldbank.org/WBSITE/EXTERNAL/EXTDEC/EXTRESEARCH/EXTLSMS/0,,contentMDK:23512006~pagePK:64168445~piPK:64168309~theSitePK:3358997,00.html
+- [DHS data](http://dhsprogram.com/data/dataset_admin/download-datasets.cfm) - unzip to data/input/DHS - 
 
-DHS data - unzip to data/input/DHS - http://dhsprogram.com/data/dataset_admin/download-datasets.cfm
+- [Download Trained CNN Model](https://www.dropbox.com/s/4cmfgay9gm2fyj6/predicting_poverty_trained.caffemodel?dl=0)
 
-(Download GDAL)
-
-2. Download Trained CNN Model
-
-https://www.dropbox.com/s/4cmfgay9gm2fyj6/predicting_poverty_trained.caffemodel?dl=0
-
-3. Download nightlights data
+3. Download nightlights data (R)
 
 ```{r download_nighlights_data, eval=FALSE,cache=TRUE}
 # Downloads nightlights data (about 400 MB zipped and 750 MB unzipped per year), saves the relevant raster, then deletes unused files locally
@@ -68,7 +62,7 @@ for (year in years){
 
 ```
 
-4. Process Survey Data
+4. Process DHS and LSMS Survey Data, linking to nightlights data (R)
 
 ```{r process_survey_data, eval=FALSE, cache=TRUE}
 ## PROCESS LSMS AND DHS DATA ##
@@ -168,7 +162,8 @@ write.table(cluster(nga13.dhs, T), '../data/output/DHS/Nigeria 2013 DHS (Cluster
 
 ```
 
-5. Save Survey Data
+5. Save Survey Data outputs (Python)
+
 ```{r engine='python', engine.path="C:/ProgramData/Anaconda2/python.exe", eval=FALSE, results='asis', cache=TRUE}
 import numpy as np
 import pandas as pd
@@ -225,7 +220,7 @@ if __name__ == '__main__':
 
 ```
 
-6. Identify existing survey cluster download locations
+6. Identify LSMS/DHS cluster download locations (Python)
 
 ```{r engine='python', engine.path="C:/ProgramData/Anaconda2/python.exe", eval=FALSE, results='asis', cache=TRUE}
 import os
@@ -325,7 +320,7 @@ if __name__ == '__main__':
 
 ```
 
-7. Generate Kaduna Grid for sampled points
+7. Generate Kaduna Grid for sampled points (R)
 
 ```{r kaduna_sampling_grid, eval=TRUE, cache=TRUE}
 #Load Kd shapefile
@@ -360,8 +355,7 @@ write.table(locations,file=paste0("../data\\output\\New\\nigeria\\","candidate_d
 
 The sample grid of daytime satellite images for Kaduna is `r length(Grid_subset)` evenly spaced points, currently not targeted to specific communities. Daytime images are approximately 1km x 1km, 400x400 pixel RGB images (Google maps zoom level 16) centered on each grid point. 
 
-
-8. Download daytime image locations
+8. Download daytime image locations for LSMS/DHS/New prediction points (R)
 
 ```{r download_day_images, eval=FALSE}
 DHS_locations <- read.table("../data\\output\\DHS\\nigeria\\candidate_download_locs_survey.txt")
@@ -412,7 +406,7 @@ write.table(lats_lons[,"cluster_long"],paste0("../data\\output\\New\\nigeria\\lo
 }
 ```
 
-9. Save lats-lons numpy for new points
+9. Save lats-lons numpy for new points (Python)
 
 ```{r save_lats_lons, engine='python', engine.path="C:/ProgramData/Anaconda2/python.exe", eval=FALSE, results='asis'}
 import os
@@ -432,7 +426,7 @@ np.save(os.path.join(new_dir,country, 'lons'), new_lons)
 
 ```
 
-10. Extract Image Features
+10. Extract Image Features from downloaded daytime satellite images (Python)
 
 ```{r extract_features, engine='python', engine.path="C:/ProgramData/Anaconda2/python.exe", eval=FALSE, results='asis'}
 import numpy as np
@@ -485,8 +479,8 @@ def get_features(net, locs_file):
         net.forward()
         raw_features.append(net.blobs['conv7'].data)
         curr_batch = []
-        model_file = '../model/predicting_poverty_deploy.prototxt'
-        weights_file = '../model/predicting_poverty_trained.caffemodel'
+        model_file = 'model/predicting_poverty_deploy.prototxt'
+        weights_file = 'model/predicting_poverty_trained.caffemodel'
         net = caffe.Net(model_file, weights_file, caffe.TEST)
         
     if len(curr_batch) > 0:
@@ -500,8 +494,8 @@ def get_features(net, locs_file):
       net.blobs['data'].data[...] = curr_batch
       net.forward()
       raw_features.append(net.blobs['conv7'].data[:batch_size])
-      model_file = '../model/predicting_poverty_deploy.prototxt'
-      weights_file = '../model/predicting_poverty_trained.caffemodel'
+      model_file = 'model/predicting_poverty_deploy.prototxt'
+      weights_file = 'model/predicting_poverty_trained.caffemodel'
       net = caffe.Net(model_file, weights_file, caffe.TEST)
   raw_features = np.vstack(raw_features)
   # average pooling
@@ -580,33 +574,33 @@ def get_locs_info(locs_file):
 
 
 if __name__ == '__main__':
-  model_file = '../model/predicting_poverty_deploy.prototxt'
-  weights_file = '../model/predicting_poverty_trained.caffemodel'
+  model_file = 'model/predicting_poverty_deploy.prototxt'
+  weights_file = 'model/predicting_poverty_trained.caffemodel'
   net = caffe.Net(model_file, weights_file, caffe.TEST)
 
   # DHS
   print("Extracting features for DHS")
   countries = ['nigeria']
-  dhs_dir = '../data/output/DHS'
+  dhs_dir = 'data/output/DHS'
   extract(net, countries, dhs_dir)
 
   # LSMS
   print("Extracting features for LSMS")
   countries = ['nigeria']
-  lsms_dir = '../data/output/LSMS'
+  lsms_dir = 'data/output/LSMS'
   extract(net, countries, lsms_dir)
 
   # New Data
   print("Extracting features for New Target   Points")
   countries = ['nigeria']
-  new_dir = '../data/output/New'
+  new_dir = 'data/output/New'
   extract(net, countries, new_dir)
   
   
   
 ```
 
-12. Scale and Organize Analysis Data
+12. Scale and Organize Analysis Data (Python)
 
 ```{r scale_organize, engine='python', engine.path="C:/ProgramData/Anaconda2/python.exe", eval=FALSE, results='asis'}
 import os
@@ -618,23 +612,23 @@ os.chdir('C:/Users/Jonny/Google Drive/Consultancy Work/Kaduna/Planning/Poverty M
 
 X_scaler = StandardScaler(with_mean=True, with_std=False)
 
-X_LSMS = np.load('../data/output/LSMS/nigeria/conv_features.npy')
+X_LSMS = np.load('data/output/LSMS/nigeria/conv_features.npy')
 X_LSMS_scaled = X_scaler.fit_transform(X_LSMS)
-np.savetxt("../analysis/X_LSMS.csv", X_LSMS_scaled, delimiter=",")
+np.savetxt("analysis/X_LSMS.csv", X_LSMS_scaled, delimiter=",")
 
-y_LSMS = np.load('../data/output/LSMS/nigeria/consumptions.npy')
-np.savetxt("../analysis/y_LSMS.csv", y_LSMS, delimiter=",")
+y_LSMS = np.load('data/output/LSMS/nigeria/consumptions.npy')
+np.savetxt("analysis/y_LSMS.csv", y_LSMS, delimiter=",")
 
-X_DHS = np.load('../data/output/DHS/nigeria/conv_features.npy')
+X_DHS = np.load('data/output/DHS/nigeria/conv_features.npy')
 X_DHS_scaled = X_scaler.fit_transform(X_DHS)
-np.savetxt("../analysis/X_DHS.csv", X_DHS_scaled, delimiter=",")
+np.savetxt("analysis/X_DHS.csv", X_DHS_scaled, delimiter=",")
 
 y_DHS = np.load('../data/output/DHS/nigeria/assets.npy')
-np.savetxt("../analysis/y_DHS.csv", y_DHS, delimiter=",")
+np.savetxt("analysis/y_DHS.csv", y_DHS, delimiter=",")
 
-X_New = np.load('../data/output/New/nigeria/conv_features.npy')
+X_New = np.load('data/output/New/nigeria/conv_features.npy')
 X_New_scaled = X_scaler.fit_transform(X_New)
-np.savetxt("../analysis/X_New.csv", X_New_scaled, delimiter=",")
+np.savetxt("analysis/X_New.csv", X_New_scaled, delimiter=",")
 #np.savetxt("analysis/X_New.csv", X_New, delimiter=",") #In case X_new should have been unscaled, but no dif...
 ```
 
@@ -699,12 +693,12 @@ pal_DHS <- colorNumeric(
 
 ```
 
-LSMS Predictions
+Sense-checking the data by predicting back to the LSMS clusters.
 ```{r LSMS_pred, eval=TRUE}
 leaflet() %>% addProviderTiles("CartoDB.Positron") %>% clearBounds() %>% addCircles(data=combined_LSMS,~long,~lat,fillColor=~pal_LSMS(Prediction_LSMS),radius=5000,stroke=FALSE,fillOpacity=0.7,opacity=0.7, weight=10,color=~pal_LSMS(Prediction_LSMS))
 ```
 
-DHS Predictions
+Sense-checking the data by predicting back to the DHS clusters.
 ```{r DHS_pred, eval=TRUE}
 leaflet() %>% addProviderTiles("CartoDB.Positron") %>% clearBounds() %>% addCircles(data=combined_DHS,~long,~lat,fillColor=~pal_DHS(Prediction_DHS),radius=5000,stroke=FALSE,fillOpacity=0.7,opacity=0.7, weight=10,color=~pal_DHS(Prediction_DHS))
 
@@ -755,18 +749,19 @@ pal_DHS <- colorNumeric(
 
 ```
 
-LSMS Predictions
+New predictions for Kaduna image locations using LSMS data.
 ```{r LSMS_pred_new, eval=TRUE}
 leaflet() %>% addProviderTiles("CartoDB.Positron") %>% clearBounds() %>% addCircles(data=combined,~long,~lat,fillColor=~pal_LSMS(Prediction_LSMS),color=~pal_LSMS(Prediction_LSMS),radius=800,stroke=FALSE,fillOpacity=0.7,opacity=0.7, weight=5)
 
 ```
 
-DHS Predictions
+New predictions for Kaduna image locations using DHS data.
 ```{r DHS_pred_new, eval=TRUE}
 leaflet() %>% addProviderTiles("CartoDB.Positron") %>% clearBounds() %>% addCircles(data=combined,~long,~lat,fillColor=~pal_DHS(Prediction_DHS),radius=400,stroke=TRUE,fillOpacity=0.4,opacity=0.05, weight=5)
 
 ```
 
+Interpolated predictions for Kaduna image locations using LSMS data (kriging).
 ```{r Interpolate_LSMS, eval=FALSE}
 library(gstat)
 library(maptools)

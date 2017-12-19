@@ -5,4 +5,4 @@
 output: html_document
 ---
 
-<iframe src="https://poliong.shinyapps.io/Kaduna_Poverty_Mapping/" style="border: none; width: 1200px; height: 800px"></iframe>
+<iframe src="https://poliong.shinyapps.io/Kaduna_Poverty_Mapping/" style="border: none; width: 1300px; height: 900px"></iframe>

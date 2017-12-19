@@ -33,9 +33,9 @@ navbar:
         - text: "Polio Vaccination in Nigeria"
           icon: fa-eyedropper
           href: polio.html
-        - text: "MDGs Mapping"
-          icon: fa-heartbeat
-          href: mgds.html
+        - text: "Kaduna Poverty Mapping"
+          icon: fa-arrows
+          href: pov_map.html
         - text: "Kaduna Data Reform"
           icon: fa-users
           href: kaduna.html

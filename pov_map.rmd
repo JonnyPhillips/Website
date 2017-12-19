@@ -1,0 +1,8 @@
+---
+#title: "Kaduna Povety Mapping"
+#author: "JP"
+#date: "June 9, 2017"
+output: html_document
+---
+
+<iframe src="https://poliong.shinyapps.io/Kaduna_Poverty_Mapping/" style="border: none; width: 1200px; height: 800px"></iframe>

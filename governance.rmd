@@ -1,9 +1,19 @@
 ---
-title: "Book Project: Good Governance in Poor Places"
+#title: ""
 #author: "JP"
 #date: "June 6, 2017"
-output: html_document
+output:
+  html_document:
+    css: "style.css"
 ---
+
+<center>
+
+## Good Governance in Poor Places
+
+</center>
+
+<br> 
 
 This dissertation and book manuscript explains when and why politicians choose to introduce rule-based inclusive governance and abandon clientelism even in extremely poor places. 
 

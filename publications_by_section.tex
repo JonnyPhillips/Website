@@ -1,0 +1,24 @@
+\documentclass{resume} % Use the custom resume.cls style
+
+\usepackage{natbib}
+\usepackage{bibentry}
+\newcommand{\bibverse}[1]{\begin{verse} \bibentry{#1}. \end{verse}}
+\nobibliography*
+
+\begin{document}
+
+\begin{rSection}{Publications}
+\textbf{Academic}
+\bibverse{Grossman2017}
+\bibverse{Dhillon2015}
+\bibverse{Diagne2012}
+\bibverse{Pan2008}
+\textbf{Journalistic}
+\bibverse{Phillips2016}
+\bibverse{Diagne2014}
+\end{rSection}
+
+\bibliographystyle{apalike}
+\nobibliography{My_papers}
+
+\end{document}

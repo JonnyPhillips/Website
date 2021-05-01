@@ -1,9 +1,0 @@
---- 
-output: html_document
-bibliography: My_papers.bib
-csl: apa_yr_rev.csl
-nocite: | 
-  @Grossman2017, @Dhillon2015, @Diagne2014, @Diagne2012, @Pan2008, @Phillips2016
----
-
-## Academic & Journalistic

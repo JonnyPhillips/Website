@@ -3,51 +3,22 @@ output_dir: "."
 navbar:
   title: "Jonathan Phillips"
   left:
-    - text: "Home"
+    - text: "Biography"
       icon: fa-home
       href: index.html
-    - text: "Governance"
+    - text: "Book Project"
       icon: fa-institution
       href: governance.html
-      menu: 
-        - text: "Book Project: Good Governance"
-          icon: fa-institution
-          href: governance.html
-        - text: "Bihar Border Survey"
-          icon: fa-map-pin
-          href: bihar.html
-    - text: "Brazil"
-      icon: fa-sun-o
-#      href: brazil_menu.html
-      menu:
-        - text: "Brazil's Spatial Politics"
-          icon: fa-map
-          href: http://200.18.49.110:3838/spatial2/
-        - text: "Northeast Survey"
-          icon: angle-right
-          href: brazil_survey.html
-    - text: "Nigeria"
-      icon: fa-flag
-      href: nigeria.html
-      menu: 
-        - text: "Polio Vaccination in Nigeria"
-          icon: fa-eyedropper
-          href: polio.html
-        - text: "Kaduna Poverty Mapping"
-          icon: fa-arrows
-          href: pov_map.html
-        - text: "Kaduna Data Reform"
-          icon: fa-users
-          href: kaduna.html
-    - text: "Data"
-      icon: fa-area-chart
-      href: data.html
     - text: "Teaching"
       icon: fa-line-chart
       href: teaching.html
     - text: "Publications"
       icon: fa-book
       href: pubs3.html
+    - text: "Data"
+      icon: fa-area-chart
+      href: data.html
+
 output:
   html_document:
     theme: journal

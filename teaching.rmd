@@ -2,15 +2,27 @@
 title: "Teaching"
 #author: "JP"
 #date: "June 9, 2017"
-output: html_document
+output:
+  html_document:
+    css: "style.css"
 ---
 
 ### Classes
-
+* Global Comparative Politics: Why Some Societies Are More Peaceful, Democratic, Rich and Equal
+ (USP FLP0473, in Portuguese) - [2019-2021](https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=FLP0473&verdis=1)
+* Quantitative Methods III: Explanation and Causation (USP FLS6441) - [2018-21](https://jonnyphillips.github.io/Methods_III/)
+* Data Analysis for the Social Sciences (USP FLS6397, in Portuguese) - [2018-21](https://jonnyphillips.github.io/Ciencia_de_Dados/)
+* Comparative Politics of Institutions (USP FLS6453, in Portuguese) [2019](https://uspdigital.usp.br/janus/componente/catalogoDisciplinasInicial.jsf?action=3&sgldis=FLS6453)
 * Causal Inference in the Political Economy of Development (USP FLS6415) - [2017](https://jonnyphillips.github.io/FLS6415/)
 * Politics in Brazil (Gov1292) - [2013](http://isites.harvard.edu/icb/icb.do?keyword=k95573), [2014](http://isites.harvard.edu/icb/icb.do?keyword=k103760) 
 * Microeconomic Theory II - Game Theory and Information Economics (Econ 2020b) - [2013](http://isites.harvard.edu/icb/icb.do?keyword=k93465&pageid=icb.page568765), [2015](http://isites.harvard.edu/icb/icb.do?keyword=k105978)
 * Political Economy of Africa (Gov1197) - [2014](http://isites.harvard.edu/icb/icb.do?keyword=k99580)
+
+### IPSA-USP Summer School
+
+- [Summer School Website](http://summerschool.fflch.usp.br/)
+- [Introduction to Spatial Analysis, 2019](https://jonnyphillips.github.io/Intro_Spatial/)
+- [Making Causal Critiques, 2019-2020](https://jonnyphillips.github.io/Causal_Critiques/)
 
 ### Workshops
 

@@ -16,7 +16,7 @@ library(knitr)
 include_graphics("JonathanPhillips.jpg")
 ```
 
-I am an Assistant Professor in the [Department of Political Science](http://dcp.fflch.usp.br/) at the [University of Sao Paulo, Brazil](https://www5.usp.br/). I am also affiliated with the [Center for Metropolitan Studies](https://centrodametropole.fflch.usp.br/en) and the [Center for the Politics and Economics of the Public Sector](http://www.cepesp.io/).
+I am an Assistant Professor in the [Institute of Political Science](https://www.universiteitleiden.nl/en/social-behavioural-sciences/political-science) at [Leiden University](https://www.universiteitleiden.nl/en/). Previously, I was affiliated with the [Department of Political Science](http://dcp.fflch.usp.br/) at the [University of Sao Paulo, Brazil](https://www5.usp.br/). I continue to be affiliated with the [Center for Metropolitan Studies](https://centrodametropole.fflch.usp.br/en) and the [Center for the Politics and Economics of the Public Sector](http://www.cepesp.io/).
 
 My research focuses on explaining the political roots of development and good governance - on why some citizens are able to reliably access public services based on their needs and rights while others depend on political connections and wealth. Through subnational comparisons in my primary fieldwork sites in Brazil, Nigeria and India I seek to clarify the incentives that lead some politicians and bureaucrats to focus on enforcing clear rules rather than diverting public resources to political supporters. 
 
@@ -24,7 +24,7 @@ Recent and ongoing research projects relate these questions to themes of **publi
 
 Methodologically, I use a range of mixed methods, including crossnational subnational comparisons, innovative survey designs and causal inference technique such as geographical regression discontinuities, to understand the conditions under which citizens are empowered to hold politicians accountable.
 
-I received a PhD in Political Science from Harvard University's [Department of Government](http://gov.harvard.edu). I have also studied at [SOAS](https://www.soas.ac.uk/) and [New College, Oxford](http://www.new.ox.ac.uk/). I continue to work in collaboration with a phenomenal team of civil servants at the [Kaduna State Bureau of Statistics](https://kdbs.ng/) to build their capacity to inform development with data. 
+I continue to work in collaboration with a phenomenal team of civil servants at the [Kaduna State Bureau of Statistics](https://kdbs.ng/) to build their capacity to inform development with data. 
 
 <br>
 
